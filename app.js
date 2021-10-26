@@ -7,13 +7,12 @@ const mongoose = require('mongoose');
 
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
-const { celebrate, Joi, errors } = require('celebrate');
+const { errors } = require('celebrate');
 
-const usersRouter = require('./routes/users');
-const moviesRouter = require('./routes/movies');
-const auth = require('./middlewares/auth');
-const { login, createUser } = require('./controllers/users');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
+
+const limiter = require('./utils/rateLimiter');
+const routes = require('./routes/index');
 
 const NotFoundError = require('./errors/notFoundError'); // 404
 
@@ -24,7 +23,7 @@ const app = express();
 app.use(requestLogger);
 
 mongoose.connect(
-  'mongodb://localhost:27017/bitfilmsdb',
+  'mongodb://localhost:27017/moviesdb',
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -35,32 +34,16 @@ mongoose.connect(
 );
 
 app.use(helmet());
+app.use(limiter);
 app.use(express.json());
 app.use(cookieParser());
-
-app.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), login);
-
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-    name: Joi.string().min(2).max(30),
-  }),
-}), createUser);
-
-app.use(auth);
-
-app.use('/users', usersRouter);
-app.use('/movies', moviesRouter);
+app.use(requestLogger);
 
 app.use('*', () => {
   throw new NotFoundError('Запрашиваемый ресурс не существует');
 });
+
+app.use(routes);
 
 app.use(errorLogger);
 app.use(errors());
