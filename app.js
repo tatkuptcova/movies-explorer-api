@@ -11,10 +11,8 @@ const { errors } = require('celebrate');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
-const limiter = require('./utils/rateLimiter');
+const limit = require('./utils/rateLimiter');
 const routes = require('./routes/index');
-
-// const NotFoundError = require('./errors/notFoundError'); // 404
 
 const { port = 3000 } = process.env;
 
@@ -34,14 +32,10 @@ mongoose.connect(
 );
 
 app.use(helmet());
-app.use(limiter);
+app.use(limit);
 app.use(express.json());
 app.use(cookieParser());
 app.use(requestLogger);
-
-// app.use('*', () => {
-//   throw new NotFoundError('Запрашиваемый ресурс не существует');
-// });
 
 app.use(routes);
 
