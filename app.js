@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const cors = require('cors');
 const { errors } = require('celebrate');
 
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -28,6 +29,13 @@ mongoose.connect(
     if (err) throw err;
   },
 );
+
+app.use(cors({
+  origin: '*',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+}));
 
 app.use(helmet());
 app.use(limit);
