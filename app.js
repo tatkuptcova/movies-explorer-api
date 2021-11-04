@@ -27,10 +27,9 @@ mongoose.connect(
     useNewUrlParser: true,
     useUnifiedTopology: true,
   },
-  (err) => {
-    if (err) throw err;
-  },
-);
+).catch((err) => {
+  throw err;
+});
 
 app.use(cors({
   origin: '*',
