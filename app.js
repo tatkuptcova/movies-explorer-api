@@ -8,6 +8,8 @@ const cookieParser = require('cookie-parser');
 const cors = require('cors');
 const { errors } = require('celebrate');
 
+const ErrorsAll = require('./middlewares/error');
+
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const limit = require('./utils/rateLimiter');
@@ -47,7 +49,7 @@ app.use(routes);
 
 app.use(errorLogger);
 app.use(errors());
-app.use(errors);
+app.use(ErrorsAll);
 
 app.listen(port, () => {
   console.log(`Сервер запущен на порту ${port}`);
