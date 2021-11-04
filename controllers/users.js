@@ -90,16 +90,6 @@ module.exports.updateUser = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        return res.status(400).send({
-          message: 'Произошла ошибка валидации',
-        });
-      }
-      return res.status(500).send({
-        message: `Произошла ошибка: ${err.name} ${err.message}`,
-      });
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
         throw new BadRequestError('Переданы некорректные данные при обновлении профиля.');
       }
       next(err);
