@@ -1,10 +1,12 @@
 const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
+const validator = require('validator');
 
 const usersRouter = require('./users');
 const moviesRouter = require('./movies');
 const auth = require('../middlewares/auth');
 const { login, createUser, logout } = require('../controllers/users');
+const errorMessages = require('../errors/errorMessages');
 
 router.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -15,9 +17,18 @@ router.post('/signin', celebrate({
 
 router.post('/signup', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-    name: Joi.string().min(2).max(30),
+    email: Joi.string().required().custom((value) => {
+      if (validator.isEmail(value)) return value;
+      throw new Error();
+    }).messages(errorMessages.email),
+    password: Joi.string().required().min(6).messages(errorMessages.password),
+    name: Joi.string().required().min(2).max(30)
+      .messages({
+        'any.rquired': 'Не указана почта',
+        'string.empty': 'Поле "имя" не содержит информацию',
+        'string.min': 'Имя должно содержать не менее {#limit} символов',
+        'string.max': 'Имя должно содержать не более {#limit} символов',
+      }),
   }),
 }), createUser);
 
