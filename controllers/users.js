@@ -25,7 +25,7 @@ module.exports.createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         throw new BadRequestError('Переданы некорректные данные при создании пользователя');
       } else if (err.name === 'MongoServerError' && err.code === 11000) {
-        throw new ConflictError('Пользователь уже существует');
+        throw new ConflictError('Пользователь с таким email уже существует');
       } else {
         next(err);
       }
@@ -89,6 +89,9 @@ module.exports.updateUser = (req, res, next) => {
       return res.send(user);
     })
     .catch((err) => {
+      if (err.name === 'MongoServerError' && err.code === 11000) {
+        throw new ConflictError('Пользователь с таким email уже существует');
+      }
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         throw new BadRequestError('Переданы некорректные данные при обновлении профиля.');
       }
