@@ -32,7 +32,7 @@ mongoose.connect(
     useUnifiedTopology: true,
   },
 ).catch((err) => {
-  throw err;
+  console.log(err);
 });
 
 app.use(cors({
