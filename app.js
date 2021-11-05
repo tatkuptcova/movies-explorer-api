@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 
+const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
@@ -18,6 +19,9 @@ const routes = require('./routes/index');
 const { port = 3000 } = process.env;
 
 const app = express();
+
+app.use(bodyParser.json()); // для соборки JSON-формата
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
 
