@@ -38,4 +38,10 @@ router.post('/signout', logout);
 router.use('/users', usersRouter);
 router.use('/movies', moviesRouter);
 
+router.use((req, res, next) => {
+  res.status(404);
+  res.send({ error: 'Not found' });
+  return next();
+});
+
 module.exports = router;

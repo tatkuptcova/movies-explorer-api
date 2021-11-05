@@ -23,7 +23,7 @@ const {
 
 const app = express();
 
-app.use(bodyParser.json()); // для соборки JSON-формата
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(requestLogger);
