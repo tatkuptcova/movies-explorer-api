@@ -26,6 +26,8 @@ module.exports.createMovie = (req, res, next) => {
   } = req.body;
 
   Movie.create({
+    nameRU,
+    nameEN,
     country,
     director,
     duration,
@@ -35,8 +37,6 @@ module.exports.createMovie = (req, res, next) => {
     trailer,
     thumbnail,
     movieId,
-    nameRU,
-    nameEN,
     owner: req.user._id,
   })
     .then((movie) => res.send(movie))
@@ -51,21 +51,22 @@ module.exports.createMovie = (req, res, next) => {
 
 module.exports.removeMovie = (req, res, next) => {
   Movie.findById(req.params.movieId)
+    .orFail(new NotFoundError('Карточка с указанным _id не найдена'))
     .then((movie) => {
-      if (!movie) {
-        throw new NotFoundError('Фильм не найден');
+      const movieOwner = movie.owner.toString();
+      if (movieOwner !== req.user._id) {
+        next(new ForbiddenError('Нельзя удалить карточку другого пользователя'));
+      } else {
+        Movie.findByIdAndRemove(req.params.movieId).then(() => {
+          res.status(200).send({ message: 'Карточка удалена' });
+        });
       }
-      if (movie.owner === req.user._id) {
-        return Movie.findByIdAndRemove(req.params.movieId)
-          .then(() => res.send());
-      }
-      throw new ForbiddenError('Недостаточно прав для удаления карточки.');
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Переданы некорректные данные.');
+        next(new BadRequestError('Некорректный _id'));
       }
-      next(err);
+      throw new NotFoundError(err.message);
     })
     .catch(next);
 };

@@ -54,13 +54,6 @@ module.exports.login = (req, res, next) => {
     });
 };
 
-module.exports.logout = (req, res) => {
-  res.clearCookie('jwt', {
-    httpOnly: true,
-  });
-  throw new UnauthorizedError('Необходима авторизация');
-};
-
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
@@ -80,8 +73,15 @@ module.exports.getUser = (req, res, next) => {
 };
 
 module.exports.updateUser = (req, res, next) => {
-  User.findByIdAndUpdate(req.user._id, { name: req.body.name, email: req.body.email },
-    { new: true, runValidators: true })
+  const { name, email } = req.body;
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, email },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .then((user) => {
       if (!user) {
         throw new NotFoundError('Пользователь с указанным _id не найден');

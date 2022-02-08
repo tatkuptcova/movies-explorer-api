@@ -5,7 +5,7 @@ const validator = require('validator');
 const usersRouter = require('./users');
 const moviesRouter = require('./movies');
 const auth = require('../middlewares/auth');
-const { login, createUser, logout } = require('../controllers/users');
+const { login, createUser } = require('../controllers/users');
 const errorMessages = require('../errors/errorMessages');
 
 router.post('/signin', celebrate({
@@ -34,7 +34,6 @@ router.post('/signup', celebrate({
 
 router.use(auth);
 
-router.post('/signout', logout);
 router.use('/users', usersRouter);
 router.use('/movies', moviesRouter);
 
